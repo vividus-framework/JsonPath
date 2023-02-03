@@ -41,3 +41,13 @@ jobs:
         env:
           RENDER_COM_DEPLOY_HOOK_URL: ${{ secrets.RENDER_COM_DEPLOY_HOOK_URL }}
         run: curl $RENDER_COM_DEPLOY_HOOK_URL
+
+      - name: 'Setup to fly.io ctl'
+        if: github.ref == 'refs/heads/fly-io'
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: 'Deploy to fly-io'
+        if: github.ref == 'refs/heads/fly-io'
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only

@@ -1,4 +1,4 @@
-name: Validate Jsonpath WEB validator Dockerfile
+name: Deploy Jsonpath WEB
 
 on:
   push:

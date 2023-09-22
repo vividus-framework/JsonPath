@@ -2,6 +2,7 @@ package com.jayway.jsonpath.internal.function;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Configurations;
+import java.util.Arrays;
 import org.junit.Test;
 
 /**
@@ -10,6 +11,7 @@ import org.junit.Test;
  * -first
  * -last
  * -index(X)
+ * -distinct
  *
  * Created by git9527 on 6/11/22.
  */
@@ -49,5 +51,10 @@ public class SequentialPathFunctionTest extends BaseFunctionTest {
         verifyFunction(conf, "$.text.index(0)", TEXT_SERIES, "a");
         verifyFunction(conf, "$.text.index(-1)", TEXT_SERIES, "f");
         verifyFunction(conf, "$.text.index(1)", TEXT_SERIES, "b");
+    }
+
+    @Test
+    public void testDistinctOfText() throws Exception {
+        verifyFunction(conf, "$.text.distinct()", TEXT_SERIES, Arrays.asList("a", "b", "c", "d", "e", "f"));
     }
 }

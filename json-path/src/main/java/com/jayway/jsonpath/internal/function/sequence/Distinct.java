@@ -12,8 +12,6 @@ import java.util.stream.StreamSupport;
 
 /**
  * Take the unique items from collection of JSONArray
- * <p>
- * Created by PavelSakharchuk on 21/09/23
  */
 public class Distinct implements PathFunction {
 

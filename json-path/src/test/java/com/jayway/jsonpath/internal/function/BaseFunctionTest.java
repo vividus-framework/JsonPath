@@ -40,8 +40,12 @@ public class BaseFunctionTest {
      *      The expected value to be returned from the test
      */
     protected void verifyFunction(Configuration conf, String pathExpr, String json, Object expectedValue) {
+        assertThat(evaluate(conf, pathExpr, json)).isEqualTo(expectedValue);
+    }
+
+    protected Object evaluate(Configuration conf, String pathExpr, String json) {
         Object result = using(conf).parse(json).read(pathExpr);
-        assertThat(conf.jsonProvider().unwrap(result)).isEqualTo(expectedValue);
+        return conf.jsonProvider().unwrap(result);
     }
 
     protected void verifyMathFunction(Configuration conf, String pathExpr, Object expectedValue) {

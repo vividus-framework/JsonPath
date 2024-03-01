@@ -12,6 +12,7 @@ import com.jayway.jsonpath.internal.function.sequence.Distinct;
 import com.jayway.jsonpath.internal.function.sequence.First;
 import com.jayway.jsonpath.internal.function.sequence.Index;
 import com.jayway.jsonpath.internal.function.sequence.Last;
+import com.jayway.jsonpath.internal.function.sequence.Random;
 import com.jayway.jsonpath.internal.function.text.Concatenate;
 import com.jayway.jsonpath.internal.function.text.Length;
 
@@ -56,6 +57,7 @@ public class PathFunctionFactory {
         map.put("last", Last.class);
         map.put("distinct", Distinct.class);
         map.put("index", Index.class);
+        map.put("random", Random.class);
 
 
         FUNCTIONS = Collections.unmodifiableMap(map);

@@ -1,11 +1,13 @@
 package com.jayway.jsonpath.internal.function;
 
 import static com.jayway.jsonpath.JsonPath.using;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Configurations;
 import java.util.Arrays;
+import java.util.List;
 
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
@@ -18,6 +20,7 @@ import org.junit.Test;
  * -last
  * -index(X)
  * -distinct
+ * -random
  *
  * Created by git9527 on 6/11/22.
  */
@@ -89,5 +92,19 @@ public class SequentialPathFunctionTest extends BaseFunctionTest {
     public void testDistinctOfEmptyObjects() throws Exception {
         final Object expectedValue = Configuration.defaultConfiguration().jsonProvider().parse("[]");
         verifyFunction(conf, "$.empty.distinct()", OBJECT_SERIES, expectedValue);
+    }
+
+    @Test
+    public void testRandomForStrings() throws Exception {
+        List<Object> elements = (List<Object>) evaluate(conf, "$.text", TEXT_AND_NUMBER_SERIES);
+        Object randomElement = evaluate(conf, "$.text.random()", TEXT_AND_NUMBER_SERIES);
+        assertThat(randomElement).isInstanceOf(String.class).isIn(elements);
+    }
+
+    @Test
+    public void testRandomForNumbers() throws Exception {
+        List<Object> elements = (List<Object>) evaluate(conf, "$.numbers", TEXT_AND_NUMBER_SERIES);
+        Object randomElement = evaluate(conf, "$.numbers.random()", TEXT_AND_NUMBER_SERIES);
+        assertThat(randomElement).isInstanceOf(Integer.class).isIn(elements);
     }
 }

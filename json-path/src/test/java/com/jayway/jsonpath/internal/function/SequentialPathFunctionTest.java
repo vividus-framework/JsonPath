@@ -1,16 +1,16 @@
 package com.jayway.jsonpath.internal.function;
 
-import static com.jayway.jsonpath.JsonPath.using;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Configurations;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.JsonPathException;
 import org.junit.Test;
 
 /**
@@ -103,8 +103,59 @@ public class SequentialPathFunctionTest extends BaseFunctionTest {
 
     @Test
     public void testRandomForNumbers() throws Exception {
-        List<Object> elements = (List<Object>) evaluate(conf, "$.numbers", TEXT_AND_NUMBER_SERIES);
-        Object randomElement = evaluate(conf, "$.numbers.random()", TEXT_AND_NUMBER_SERIES);
-        assertThat(randomElement).isInstanceOf(Integer.class).isIn(elements);
+        Object randomElements = evaluate(conf, "$.numbers.random(1)", TEXT_AND_NUMBER_SERIES);
+        assertThat(randomElements).isInstanceOf(List.class);
+        List<?> randomList = (List<?>) randomElements;
+        assertThat(randomList).hasSize(1);
     }
+
+    @Test
+    public void testRandomForMoreNumbers() {
+        List<Object> elements = (List<Object>) evaluate(conf, "$.numbers", TEXT_AND_NUMBER_SERIES);
+        Object randomElements = evaluate(conf, "$.numbers.random(5)", TEXT_AND_NUMBER_SERIES);
+        assertThat(randomElements).isInstanceOf(List.class);
+        List<?> randomList = (List<?>) randomElements;
+        assertThat(randomList).hasSize(5);
+        Set<Object> randomSet = new HashSet<>(randomList);
+        assertThat(randomList.size()).isEqualTo(randomSet.size());
+        assertThat(elements).containsAll(randomList);
+    }
+
+    @Test
+    public void testRandomOnNonArrayShouldFail() {
+        String json = "{\"value\":\"not-an-array\"}";
+        assertThatThrownBy(() -> evaluate(conf, "$.value.random()", json))
+                .isInstanceOf(JsonPathException.class)
+                .hasMessage("Aggregation function attempted to get a random item from not array");
+    }
+
+    @Test
+    public void testMoreThanOneParameterShouldFail() {
+        assertThatThrownBy(() -> evaluate(conf, "$.numbers.random(1, 2)", TEXT_AND_NUMBER_SERIES))
+                .isInstanceOf(JsonPathException.class)
+                .hasMessage("Random function accepts at most one parameter");
+    }
+
+    @Test
+    public void testNegativeParameterShouldFail() {
+        assertThatThrownBy(() -> evaluate(conf, "$.numbers.random(-1)", TEXT_AND_NUMBER_SERIES))
+                .isInstanceOf(JsonPathException.class)
+                .hasMessage("Random function parameter must be greater than 0 and less than or equal to the size of the array");
+    }
+
+    @Test
+    public void testZeroValueParameterShouldFail() {
+        assertThatThrownBy(() -> evaluate(conf, "$.numbers.random(0)", TEXT_AND_NUMBER_SERIES))
+                .isInstanceOf(JsonPathException.class)
+                .hasMessage("Random function parameter must be greater than 0 and less than or equal to the size of the array");
+    }
+
+    @Test
+    public void testBiggerThanSizeShouldFail() {
+        assertThatThrownBy(() -> evaluate(conf, "$.numbers.random(100)", TEXT_AND_NUMBER_SERIES))
+                .isInstanceOf(JsonPathException.class)
+                .hasMessage("Random function parameter must be greater than 0 and less than or equal to the size of the array");
+    }
+
+
 }
